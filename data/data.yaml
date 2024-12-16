@@ -1,0 +1,10 @@
+# Path to the dataset root directory
+train: /content/drive/MyDrive/datasetYOLO640_tiff/train/images
+val: /content/drive/MyDrive/datasetYOLO640_tiff/validation/images
+
+# Number of classes
+nc: 1
+
+# Class names
+names: 
+  0: oocyte
