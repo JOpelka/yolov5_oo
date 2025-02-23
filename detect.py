@@ -250,33 +250,49 @@ def run(
                     n = (det[:, 5] == c).sum()  # detections per class
                     s += f"{n} {names[int(c)]}{'s' * (n > 1)}, "  # add to string
 
-                # Write results
-                for *xyxy, conf, cls in reversed(det):
-                    c = int(cls)  # integer class
-                    label = names[c] if hide_conf else f"{names[c]}"
-                    confidence = float(conf)
-                    confidence_str = f"{confidence:.2f}"
+                # Define edge offset (margin in pixels)
+                    # Define edge offset (margin in pixels)
+        EDGE_OFFSET = 50  # Adjust this value as needed
+        
+        # Write results
+        for *xyxy, conf, cls in reversed(det):
+            x1, y1, x2, y2 = map(int, xyxy)  # Convert to integer coordinates
+        
+            # Get image dimensions
+            img_h, img_w, _ = im0.shape  
+        
+            # Skip detection if it's too close to the edges
+            if (x1 < EDGE_OFFSET or y1 < EDGE_OFFSET or 
+                x2 > img_w - EDGE_OFFSET or y2 > img_h - EDGE_OFFSET):
+                continue  # Skip this detection
+        
+            c = int(cls)  # integer class
+            label = names[c] if hide_conf else f"{names[c]}"
+            confidence = float(conf)
+            confidence_str = f"{confidence:.2f}"
+        
+            if save_csv:
+                write_to_csv(p.name, label, confidence_str)
+        
+            if save_txt:  # Write to file
+                if save_format == 0:
+                    coords = (
+                        (xyxy2xywh(torch.tensor(xyxy).view(1, 4)) / gn).view(-1).tolist()
+                    )  # normalized xywh
+                else:
+                    coords = (torch.tensor(xyxy).view(1, 4) / gn).view(-1).tolist()  # xyxy
+                line = (cls, *coords, conf) if save_conf else (cls, *coords)  # label format
+                with open(f"{txt_path}.txt", "a") as f:
+                    f.write(("%g " * len(line)).rstrip() % line + "\n")
+        
+            if save_img or save_crop or view_img:  # Add bbox to image
+                label = None if hide_labels else (names[c] if hide_conf else f"{names[c]} {conf:.2f}")
+                annotator.box_label(xyxy, label, color=colors(c, True))
+            
+            if save_crop:
+                save_one_box(xyxy, imc, file=save_dir / "crops" / names[c] / f"{p.stem}.jpg", BGR=True)
 
-                    if save_csv:
-                        write_to_csv(p.name, label, confidence_str)
 
-                    if save_txt:  # Write to file
-                        if save_format == 0:
-                            coords = (
-                                (xyxy2xywh(torch.tensor(xyxy).view(1, 4)) / gn).view(-1).tolist()
-                            )  # normalized xywh
-                        else:
-                            coords = (torch.tensor(xyxy).view(1, 4) / gn).view(-1).tolist()  # xyxy
-                        line = (cls, *coords, conf) if save_conf else (cls, *coords)  # label format
-                        with open(f"{txt_path}.txt", "a") as f:
-                            f.write(("%g " * len(line)).rstrip() % line + "\n")
-
-                    if save_img or save_crop or view_img:  # Add bbox to image
-                        c = int(cls)  # integer class
-                        label = None if hide_labels else (names[c] if hide_conf else f"{names[c]} {conf:.2f}")
-                        annotator.box_label(xyxy, label, color=colors(c, True))
-                    if save_crop:
-                        save_one_box(xyxy, imc, file=save_dir / "crops" / names[c] / f"{p.stem}.jpg", BGR=True)
 
             # Stream results
             im0 = annotator.result()
