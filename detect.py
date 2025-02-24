@@ -252,7 +252,7 @@ def run(
 
                 # Define edge offset (margin in pixels)
                     # Define edge offset (margin in pixels)
-        EDGE_OFFSET = 50  # Adjust this value as needed
+        EDGE_OFFSET = 20  # Adjust this value as needed
         
         # Write results
         for *xyxy, conf, cls in reversed(det):
