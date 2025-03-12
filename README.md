@@ -1,8 +1,3 @@
-<div align="center">
-  <p>
-    <img width="100%" src="https://raw.githubusercontent.com/ultralytics/assets/main/yolov8/banner-yolov8.png">
-  </p>
-</div>
 
 # YOLO_oo 🚀 - YOLO for Mole Rat Oocyte Detection
 
