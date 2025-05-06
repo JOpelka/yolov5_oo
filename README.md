@@ -33,17 +33,6 @@ YOLO_oo (YOLO for Oocyte Observation) is a deep learning model trained on annota
 
 ---
 
-## 🧪 YOLO_oo Inference Example
-
-```python
-import torch
-
-# Load custom YOLO_oo model (replace path with your trained model)
-model = torch.hub.load("ultralytics/yolov5", "custom", path="yolo_oo.pt")
-
-# Run inference on an image
-img = "sample_oocyte_image.jpg"
-results = model(img)
 
 # Show results
 results.print()
